@@ -1,29 +1,37 @@
-from instapy import InstaPy
-from instapy import smart_run
-from instapy import set_workspace
-import time
+import argparse
 
-INSTA_USERNAME = ""
-INSTA_PASSWORD = ""
+from instapy import InstaPy, smart_run
 
-set_workspace(path=None)
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--instagram_login", action="store", help="Your instagram login", required=True
+)
+parser.add_argument(
+    "--instagram_password",
+    action="store",
+    help="Your instagram password",
+    required=True,
+)
+parser.add_argument(
+    "--to_follow",
+    action="store",
+    help="Follow the users of this account",
+    required=True,
+)
+parser.add_argument(
+    "--amount", action="store", help="The amount of users to follow", required=True
+)
+args = parser.parse_args()
+
+instagram_login = args.instagram_login
+instagram_password = args.instagram_password
+instagram_to_follow = list(args.to_follow)
+instagram_amount = args.amount
 
 
-def job():
-    try:
-        session = InstaPy(username=INSTA_USERNAME, password=INSTA_PASSWORD).login()
-        session.login()
-    except Exception as error:
-        print(f"Error at initializing session due to {repr(error)}")
-    with smart_run(session):
-        try:
-            session.follow_user_followers(
-                usernames=["thoughtforfoodorg"], amount=6000, randomize=False
-            )
-        except Exception as error:
-            print(f"Error {repr(error)} at follow_user_followers")
-    session.end()
+session = InstaPy(username=instagram_login, password=instagram_password)
 
-
-if __name__ == "__main__":
-    job()
+with smart_run(session):
+    session.follow_user_followers(
+        usernames=instagram_to_follow, amount=instagram_amount, randomize=False
+    )
